@@ -5,20 +5,19 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Properties;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import com.fges.ckonsoru.bdd.ConnexionBddDAO;
 import com.fges.ckonsoru.bdd.GestionAction;
 import com.fges.ckonsoru.xml.Ecran;
-
 import org.xml.sax.SAXException;
 
 
 public class App {
 
-    public static void main(String args[]) throws ParseException, SAXException, IOException, TransformerException, SQLException{
+    public static void main(String args[]) throws ParseException, SAXException, IOException, TransformerException, SQLException, ParserConfigurationException{
       
-        /*System.out.println("Bienvenue sur Clinique Konsoru !");
+       System.out.println("Bienvenue sur Clinique Konsoru !");
         
         ConfigLoader cf = new ConfigLoader();
         Properties properties = cf.getProperties();
@@ -50,11 +49,11 @@ public class App {
             maGestion.doAction();
         }
        
-        */
+    
+       
+      
 
 
-        ConnexionBddDAO test = new ConnexionBddDAO();
-        test.ListerPlanningParVeto();
     }
 
 }

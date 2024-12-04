@@ -2,12 +2,13 @@ package com.fges.ckonsoru.xml;
 
 import java.io.File;
 import java.io.IOException;
-
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 
@@ -15,34 +16,33 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import com.fges.ckonsoru.metier.Client;
+import com.fges.ckonsoru.metier.RDV;
+
 public class AfficherRDV {
-	ConnexionXmlDAO dataXml = new ConnexionXmlDAO();
-	File file = dataXml.getFile("ckonsoru.xml");
+	
 
 	
-	public ArrayList<String> getAllRDVAfficher(String Client) throws SAXException, IOException {
+	public ArrayList<RDV> getAllRDVAfficher(Client Client) throws SAXException, IOException, ParserConfigurationException {
+		LocalDateTime rienDate = null;
+		ArrayList<RDV> RendezVous = new ArrayList<RDV>();
 		
-		ArrayList<String> RendezVous = new ArrayList<String>();
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();  
-		//an instance of builder to parse the specified xml file  
-		DocumentBuilder db;
-		try {
-			db = dbf.newDocumentBuilder();
-			Document doc = db.parse(file); 
-			doc.getDocumentElement().normalize();  
+		RDV Complet = new RDV(rienDate, "veto", Client);
+		
+		Document doc = ConnexionXmlSingleton.getInstance().getDoc(); 
 			
-			NodeList RDV = doc.getElementsByTagName("rdv");
-			Node DebutRendezVous = (Node) RDV.item(0).getChildNodes();
+			NodeList RDVC = doc.getElementsByTagName("rdv");
+			Node DebutRendezVous = (Node) RDVC.item(0).getChildNodes();
 			
 			
 			
 			String client;
 			//String ligne = null;
-			for (int i = 0; i <RDV.getLength() ; i++) {
+			for (int i = 0; i <RDVC.getLength() ; i++) {
 				
 				
 				
-				DebutRendezVous = (Node) RDV.item(i).getChildNodes();
+				DebutRendezVous = (Node) RDVC.item(i).getChildNodes();
 				
 				client = DebutRendezVous.getTextContent().toString();
 				
@@ -52,29 +52,19 @@ public class AfficherRDV {
 				String vetodure = parts[3];
 				
 				
-				if(clientdure.equals(Client)) {
-			
-		        
-		        	String LeJour = datedure.substring(8,10);
-			        String LeMois = datedure.substring(5,7);
-			        String LAnnee = datedure.substring(0,4);
-			        String Heure = datedure.substring(11,13);
-					String Minutes = datedure.substring(14,16);
+				if(clientdure.equals(Client.getNom())) {
 					
-					String Complet = LeJour+"/"+LeMois+"/"+LAnnee+" "+Heure+":"+Minutes+" avec "+ vetodure;
-					System.out.println(Complet);
+				 DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+				 LocalDateTime debut1 = LocalDateTime.parse(datedure, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+					
+					Complet = new RDV(debut1 ,vetodure, Client);
 					RendezVous.add(Complet);
 		        }
 			}
-						
-			
-		} catch (Exception e) {
-		
-		}
-		
-		
 		return RendezVous;
-	  
 	}
+	
+	
+	
 	
 }

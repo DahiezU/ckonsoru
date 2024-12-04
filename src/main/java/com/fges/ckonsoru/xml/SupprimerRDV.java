@@ -26,21 +26,15 @@ import javax.xml.transform.TransformerException;
 
 
 public class SupprimerRDV {
-	ConnexionXmlDAO dataXml = new ConnexionXmlDAO();
-	File file = dataXml.getFile("ckonsoru.xml");
+	
 	public void SupprRdvSuppr(String Date, String Client) throws TransformerException, SAXException {
 	
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		factory.setNamespaceAware(true);
-		DocumentBuilder builder;
-		//List<RendezVous> rdvs = new LinkedList<>();
+		
 		
 		try {
 			// charger le fichier xml
 			
-			builder = factory.newDocumentBuilder();
-			String filepath = ".\\src\\main\\resources\\ckonsoru.xml";
-			Document xmldoc = builder.parse(filepath);
+			Document xmldoc = ConnexionXmlSingleton.getInstance().getDoc();
 			NodeList RDV = xmldoc.getElementsByTagName("rdv");
 
 			String LeJour = Date.substring(0,2);
@@ -56,12 +50,12 @@ public class SupprimerRDV {
 				Element product = (Element) RDV.item(i);
 				Element dateTag = (Element) product.getElementsByTagName("debut").item(0);
 				Node clientTag = product.getElementsByTagName("client").item(0);
-				System.out.println("ouais "+i+" : "+ clientTag.getParentNode().getTextContent());
+				
 				if (dateTag.getTextContent().equalsIgnoreCase(LaDate) && clientTag.getTextContent().equalsIgnoreCase(Client)) {
-					System.out.println("ouais 0 : "+ clientTag.getParentNode().getParentNode().getTextContent());
+					
 					clientTag.getParentNode().getParentNode().removeChild(RDV.item(i));
 					
-					System.out.println("ouais 1 : "+ clientTag.getParentNode().getTextContent());
+					
 				}
 			}
 			
@@ -83,9 +77,9 @@ public class SupprimerRDV {
 				
 					e.printStackTrace();
 				}
-				StreamResult result = new StreamResult(filepath);
+				StreamResult result = new StreamResult(".\\src\\main\\resources\\ckonsoru.xml");
 				transformer.transform(source, result);
-		} catch (IOException | ParserConfigurationException e) {
+		} catch (IOException e) {
 		e.printStackTrace(System.err);
 		}
 		return;

@@ -1,9 +1,12 @@
 package com.fges.ckonsoru.bdd;
 
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.InputMismatchException;
 import java.util.Scanner;
+
+import com.fges.ckonsoru.metier.Client;
 
 public class GestionAction {
 
@@ -54,14 +57,16 @@ public class GestionAction {
 
     }
 
-    public void  doAction(){
+    public void  doAction() throws SQLException{
             int numero = this.selectChoix();
+            DateConv convertisseur = new DateConv();
           
             while(numero != 9){
-                ConnexionBDD test = new ConnexionBDD();
+                
     
                 switch(numero) {
-                    case 1:                    
+                    case 1: 
+
                         String explicationStrDispo = "Entrer une date au format JJ/MM/AAAA (ex: 18/03/2021) :";
                         System.out.println(explicationStrDispo);
                         
@@ -74,10 +79,11 @@ public class GestionAction {
                         LocalDateTime debut = LocalDateTime.parse(DateIn+" 01:00", timeFormatter);
 
             
-    
-                        test.AffichageDispoCorrect(test.dispoAllVet(debut) , debut);
 
-                    this.doAction();
+                        GestionRdvDAO.ListerDisponibilite(debut);
+                       
+
+                        this.doAction();
 
                     break;
 
@@ -87,7 +93,13 @@ public class GestionAction {
                         System.out.println(explicationStrRdvCli);
                         Scanner scanNom = new Scanner(System.in);
                         String nomCli =  scanNom.nextLine();
-                        test.rdvClientAfficher(nomCli);
+
+                        Client cli = new Client(nomCli );
+                    
+                    
+                        GestionRdvDAO.ListerRDV(cli);
+                   
+                    
 
                         this.doAction();
                     break;
@@ -103,7 +115,7 @@ public class GestionAction {
 
 
 
-                        //de la 
+                      
                         
                         boolean boolTest =  this.compareDate(this.convertStringToDate(dateRdv));
                         while(boolTest){
@@ -114,8 +126,7 @@ public class GestionAction {
                             boolTest = this.compareDate(this.convertStringToDate(dateRdv));
 
                         }
-
-
+                       
 
                         System.out.println("Indiquer le nom du vétérinaire" );                   
                         Scanner scanNomRdv = new Scanner(System.in);
@@ -126,8 +137,12 @@ public class GestionAction {
                         String nomCliRdv =  scanNomCliRdv.nextLine();
                         
                         
-    
-                        test.priseRdv(dateRdv,nomVetRdv,nomCliRdv);
+                        cli = new Client(nomCliRdv  );
+                        GestionRdvDAO.AjoutRDV(convertisseur.stringToDate(dateRdv) , cli ,nomVetRdv  );
+                       
+                        
+
+                      
                         this.doAction();
                     break;
 
@@ -148,7 +163,7 @@ public class GestionAction {
                             System.out.println(explicationSupprimerRdv);
                             DateRdvsupp = scanDateCliSupprRDV.nextLine();
 
-    
+                         
 
                             boolTest =  this.compareDate(this.convertStringToDate(DateRdvsupp));
 
@@ -161,7 +176,12 @@ public class GestionAction {
 
 
                         
-                        test.supprRdv(DateRdvsupp ,nomCliRdvsupp );
+                          cli = new Client(nomCliRdvsupp );
+                
+                        
+                        GestionRdvDAO.SupprimerRDV(convertisseur.stringToDate(DateRdvsupp) , cli );
+                       
+                      
                         
                         this.doAction();
                     break;

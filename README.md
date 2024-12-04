@@ -1,4 +1,4 @@
-#Projet  ckonsoru
+#Projet  ckonsoruV2
 
 
 Projet réalisé par Dahiez Ulysse et Burdy Simon
@@ -32,24 +32,37 @@ Cette class sert à afficher et à interagir entre l'utilisateur et les différe
 
 Cette classe sert à lancer le programme.
 
+### FonctionnalitesDAO.java :
+
+Dans cette classe nous pouvons appeler toute les fonctions disponible pour faire fonctionner les fonctionnalites
+
+### ConnexionXmlDAO.Java
+
+Dans cette class, nous avons tout les requis pour connecter le fichier Xml dans les différents fonnctions.
+
+## Métiers
+
+### Client.Java
+
+Cette classe est le métier du client 
+
+### Disponibilite.Java
+
+Cette classe est le métier du Disponibilite 
+
+### RDV.Java
+
+Cette classe est le métier du RDV 
+
 ## Partie BDD réalisé par Burdy Simon : 
 
-  - Classe ConnexionBDD :
-    Cette  classe   permet d'intéragir avec la BDD , c'est  la classe principale de l'application Ckonsoru . <br>
+  - Classe ConnexionBddDAO :
+    Cette classe est une DAO faisant le lien en la bdd par l'intermédiaire de ConnexionSingleton et le lien<br>
+    entre GestionRdvDao .
     Elle permet de  recuperer les informations de la bases et de les traiter \. <br>
-    N'ayant ps vu que vous utilisiez la fonction creneauxDisponibles en sql , j'ai de nombreuses fonctions <br> 
-    permettant d'avoir le meme résultat en bien moins propre et bien plus de lignes de code \.<br> 
-        -  Function rdvClientAfficher : Affiche  tout les rdvs d'un Client <br> 
-        -  Function  afficherDispo :recupere les diapo d'un client  <br> 
-        -  Function comparaisonDate : fait les dispos d'un veto pour un jour  - les rdvs d'un veto pour 1 jour <br> 
-        -  Function DispoAllVet :boucle la function comparaisonDate pour tout les veto  <br> 
-        -  Function AffichageDispoCorrect : Affiche les dispo dans la console  <br> 
-        -  Function priseRdv : Prend un rdv  <br> 
-        -  Function supprRdv : supprime un rdv  <br> 
-  -  Classe GestionAction : 
-    Cette classe fait l'interface entre l'utilisateur et la classe connexionBDD , elle ecoute les actions <br>
-    de l'utilisateur et execute les fonctions de la classe connexionBDD \. <br>
-      -  Function selectCode :
-          -   Boucle pour afficher les options 
-      -  Function do Action :
-          -  Execuite la bonne action 
+    
+  -  Classe ConnexionSingeton  : 
+    Cette classe  est un singleton initiant la connexion avec la BDD\. <br>
+
+  -  Classe  GestionAction : 
+     Cette classe ecoute les actions de l'utilisateur et appelle l'interface GestionRdvDao 

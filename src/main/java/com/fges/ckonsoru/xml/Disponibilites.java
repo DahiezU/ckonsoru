@@ -7,6 +7,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.fges.ckonsoru.metier.Disponibilite;
+import com.fges.ckonsoru.metier.RDV;
+
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.List;
@@ -18,64 +21,70 @@ import org.w3c.dom.Node;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Disponibilites {
 
-	ConnexionXmlDAO dataXml = new ConnexionXmlDAO();
-	File file = dataXml.getFile("ckonsoru.xml");
-
 	
-	public ArrayList<String> getAllDidponibiliteDispo(LocalDateTime Date) throws SAXException, IOException {
+	
+	public ArrayList<Disponibilite> getAllDidponibiliteDispo(LocalDateTime Date) throws SAXException, IOException {
 		
-		ArrayList<String> Liste = new ArrayList<String>();
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();  
-		//an instance of builder to parse the specified xml file  
-		DocumentBuilder db;
+		ArrayList<Disponibilite> Liste = new ArrayList<Disponibilite>();
+		Disponibilite Complet = new Disponibilite(Date, "");
+		
 		
 		ArrayList<String> Vetodb = new ArrayList<String>();
-		ArrayList<String> ListDispo = new ArrayList<String>();
-		try {
-			db = dbf.newDocumentBuilder();
-			Document doc = db.parse(file); 
-			doc.getDocumentElement().normalize();  
-			NodeList NodeList = doc.getElementsByTagName("veterinaire");
+		ArrayList<Disponibilite> ListDispo = new ArrayList<Disponibilite>();
+		Document doc = ConnexionXmlSingleton.getInstance().getDoc(); 
+		NodeList NodeList = doc.getElementsByTagName("veterinaire");
+		
+		for (int i = 0; i <NodeList.getLength() ; i++) {
+			String Veterinaire = doc.getElementsByTagName("veterinaire").item(i).getTextContent();
+			Vetodb.add(Veterinaire);
+		}
+		
+		Set<String> mySet = new HashSet<String>(Vetodb);
+		List<String> Veto = new ArrayList<String>(mySet);
+		
+
+		
+		for (int i = 0; i <Veto.size() ; i++) {
+			ListDispo = searchDisponibilite( Date, Veto.get(i));
 			
-			for (int i = 0; i <NodeList.getLength() ; i++) {
-				String Veterinaire = doc.getElementsByTagName("veterinaire").item(i).getTextContent();
-				Vetodb.add(Veterinaire);
+			for (int j = 0; j <ListDispo.size() ; j++) {
+				
+				
+				
+				Complet = new Disponibilite(ListDispo.get(j).getDate() , ListDispo.get(j).getVeto());
+				
+				Liste.add(Complet);
+				
+				
+				
 			}
-			
-			Set<String> mySet = new HashSet<String>(Vetodb);
-		    List<String> Veto = new ArrayList<String>(mySet);
-		    
-			
-			for (int i = 0; i <Veto.size() ; i++) {
-				ListDispo = searchDidponibilite ( Date, Veto.get(i));
-				for (int j = 0; j <ListDispo.size() ; j++) {
-					Liste.add(ListDispo.get(j));
-				}
-			}
-		} catch (ParserConfigurationException e) {
-			
-			e.printStackTrace();
 		}  
 		return Liste;
 	}
 	
 	
-	public ArrayList<String> searchDidponibilite (LocalDateTime Date, String Veterinaire) throws SAXException, IOException {
+	public ArrayList<Disponibilite> searchDisponibilite (LocalDateTime Date, String Veterinaire) throws SAXException, IOException {
 		
-		ArrayList<String> Disponibilites = new ArrayList<String>();
+		ArrayList<Disponibilite> Disponibilites = new ArrayList<Disponibilite>();
+		Disponibilite Complet = new Disponibilite(Date, "");
 		try {
-		ArrayList<String> RendezVous = new ArrayList<String>();
+		ArrayList<Disponibilite> RendezVous = new ArrayList<Disponibilite>();
 		ArrayList<Integer> Index = new ArrayList<Integer>();
+		
+		
 		Disponibilites = getDisponibilites(Veterinaire,Date);
+		
 		
 		RendezVous = getRDVVeto(Veterinaire, Date);
 		
 		for(int i = 0; i<Disponibilites.size(); i++) {
+			
 			for(int j = 0; j<RendezVous.size(); j++) {
-				if(Disponibilites.get(i).equals(RendezVous.get(j))) {
+				if(Disponibilites.get(i).getDate().equals(RendezVous.get(j).getDate())) {
 					Index.add(i);
 				}
 			}
@@ -88,110 +97,105 @@ public class Disponibilites {
 		
 		return Disponibilites;
 	} catch (Exception e) {
+		
 		return Disponibilites;
+		
 		}
 		
 	}
 	
-	
-	
-	public ArrayList<String> getDisponibilites(String veterinaire, LocalDateTime Date) throws SAXException, IOException {
+	public ArrayList<Disponibilite> getDisponibilites(String veterinaire, LocalDateTime Date) throws SAXException, IOException {
 		int Yout = 0;
 		
-		ArrayList<String> Disponibilites = new ArrayList<String>();
+		ArrayList<Disponibilite> Disponibilites = new ArrayList<Disponibilite>();
 		
 		 	String LeJour = Date.toString().substring(8, 10);
 	        String LeMois = Date.toString().substring(5, 7);
 	        String LAnnee = Date.toString().substring(0,4);
 	       
 		
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();  
-		//an instance of builder to parse the specified xml file  
-		DocumentBuilder db;
-		try {
-			db = dbf.newDocumentBuilder();
-			Document doc = db.parse(file); 
-			doc.getDocumentElement().normalize();  
-			//NodeList NodeList = doc.getElementsByTagName("debut");
+		
+		Document doc = ConnexionXmlSingleton.getInstance().getDoc();
+		
+		
+		NodeList Journee = doc.getElementsByTagName("jour");
+		
+		
+		for (int i = 0; i <Journee.getLength() ; i++) {
 			
 			
-			NodeList Journee = doc.getElementsByTagName("jour");
 			
-			
-			for (int i = 0; i <Journee.getLength() ; i++) {
-				
-				
-				
-					if(Journee.item(i).getTextContent().equals(this.getDay(Date))) {
-						
-						
-						String Dispo = doc.getElementsByTagName("debut").item(i).getTextContent();
-						String Veterinaire = doc.getElementsByTagName("veterinaire").item(i).getTextContent();
-						String Heure = "";
-						String Minutes = "";
-						Yout = 0;
-					do {
+				if(Journee.item(i).getTextContent().equals(this.getDay(Date))) {
+					
+					
+					String Dispo = doc.getElementsByTagName("debut").item(i).getTextContent();
+					String Veterinaire = doc.getElementsByTagName("veterinaire").item(i).getTextContent();
+					String Heure = "";
+					String Minutes = "";
+					Yout = 0;
+				do {
 
+					
+					Heure = Dispo.substring(0,2);
+					Minutes = Dispo.substring(3,5);
+					
+					if(Yout != 0) {
+					Minutes = String.valueOf(Integer.parseInt (Minutes) + 20);
+					
+					}else {Yout = 1;}
+
+					if(Minutes.equals("60")) {
+						Minutes = "00";
 						
-						Heure = Dispo.substring(0,2);
-						Minutes = Dispo.substring(3,5);
+						Heure = String.valueOf(Integer.parseInt (Heure) + 1);
 						
-						if(Yout != 0) {
-						Minutes = String.valueOf(Integer.parseInt (Minutes) + 20);
-						
-						}else {Yout = 1;}
-		
-						if(Minutes.equals("60")) {
-							Minutes = "00";
-							
-							Heure = String.valueOf(Integer.parseInt (Heure) + 1);
-							
-							if(Integer.parseInt (Heure) < 10) {
-								Heure = "0" + Heure;
-							}
+						if(Integer.parseInt(Heure) < 10) {
+							Heure = "0" + Heure;
 						}
-						
-						Dispo = Heure+":"+ Minutes;
-						String Ligne = Veterinaire + " : " + LeJour+"/"+LeMois+"/"+LAnnee + " " + Dispo;
-						if(Veterinaire.equals(veterinaire)){
-							
-						Disponibilites.add(Ligne);
-						
-						
 					}
-				    } while (Dispo.equals(doc.getElementsByTagName("fin").item(i).getTextContent()) == false);
+					
+					Dispo = Heure+":"+ Minutes;
+					String Ligne =LAnnee +"-"+LeMois+"-"+ LeJour+ "T" +Dispo+":00";
+					
+					if(Veterinaire.equals(veterinaire)){
 						
-					}
-			} 
+					
+						DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+						LocalDateTime debut1 = LocalDateTime.parse(Ligne, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+						
 				
-		} catch (ParserConfigurationException e) {
-		
-			e.printStackTrace();
+						Disponibilites.add(new Disponibilite(debut1  , Veterinaire));
+					
+				}
+			    } while (Dispo.equals(doc.getElementsByTagName("fin").item(i).getTextContent()) == false);
+					
+				}
 		}  
 		Disponibilites.remove(Disponibilites.size()-1);
-		//System.out.println(Disponibilites);
+		
+		
 		return Disponibilites;
 		
 	}
 	
-	public ArrayList<String> getRDVVeto(String veterinaire, LocalDateTime dateRDV) {
+	
+	public ArrayList<Disponibilite> getRDVVeto(String veterinaire, LocalDateTime Date) {
 		
-		ArrayList<String> RendezVous = new ArrayList<String>();
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();  
-		//an instance of builder to parse the specified xml file  
-		DocumentBuilder db;
+		ArrayList<Disponibilite> RendezVous = new ArrayList<Disponibilite>();
+		Disponibilite Complet = new Disponibilite(Date, "");
+		
 		try {
-			db = dbf.newDocumentBuilder();
-			Document doc = db.parse(file); 
-			doc.getDocumentElement().normalize();  
+			Document doc = ConnexionXmlSingleton.getInstance().getDoc();
 			
 			NodeList RDV = doc.getElementsByTagName("rdv");
 			Node DebutRendezVous = (Node) RDV.item(0).getChildNodes();
-			
-			
-			
+			//2021-03-18T14:00:00
+			String LeJour = Date.toString().substring(8, 10);
+	        String LeMois = Date.toString().substring(5, 7);
+	        String LAnnee = Date.toString().substring(0,4);
+	        
 			String veto;
-			//String ligne = null;
+			
 			for (int i = 0; i <RDV.getLength() ; i++) {
 				
 				
@@ -200,32 +204,42 @@ public class Disponibilites {
 				
 				veto = DebutRendezVous.getTextContent().toString();
 				
+
+				
 				String[] parts = veto.split("\\n");
 				String datedure = parts[1];
-				//String clientdure = parts[2];
+				
 				String vetodure = parts[3];
 				
 				
+				
+				String Heure  = datedure.substring(11, 13);
+		        String Minutes = datedure.substring(14,16);
+		        
+		        
+		        
 				if(vetodure.equals(veterinaire)) {
 			
-		        if(datedure.substring(0,10).equals(dateRDV.toString().substring(0,10))) {
-		        	String LeJour = datedure.substring(8,10);
-			        String LeMois = datedure.substring(5,7);
-			        String LAnnee = datedure.substring(0,4);
-			        String Heure = datedure.substring(11,13);
-					String Minutes = datedure.substring(14,16);
+		        if(datedure.substring(0,10).equals(Date.toString().substring(0,10))) {
+		        	
+		        		
+		        		
+		        		String Ligne =LAnnee +"-"+LeMois+"-"+ LeJour+ "T" +Heure+":"+ Minutes+":00";
+		        		
+		        		
 					
-					String Complet = vetodure+" : "+LeJour+"/"+LeMois+"/"+LAnnee+" "+Heure+":"+Minutes;
-					//System.out.println(Complet);
+						DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+						LocalDateTime debut1 = LocalDateTime.parse(Ligne, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+						
+		        	
+		        	Complet = new Disponibilite(debut1 , vetodure);
 					RendezVous.add(Complet);
 		        }
 				}
 			}
-			
-						
-			
+
 		} catch (Exception e) {
-		
+			System.out.println("problème : getRDVVeto()");
 		}
 		
 		
@@ -258,11 +272,6 @@ public class Disponibilites {
 		}
 		return jour;
 	}
-	
-	
-	
-	public void mainXml () throws ParserConfigurationException, SAXException, IOException {
-		
-	}
+
 	
 }

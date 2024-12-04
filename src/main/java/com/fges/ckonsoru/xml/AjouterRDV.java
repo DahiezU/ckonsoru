@@ -21,24 +21,16 @@ import org.xml.sax.SAXException;
 
 
 public class AjouterRDV {
-	ConnexionXmlDAO dataXml = new ConnexionXmlDAO();
-	File file = dataXml.getFile("ckonsoru.xml");
+	
 	
 	
 	
 	public void addRDVAjouter(String Veterinaire, String Date, String Client) throws SAXException, TransformerException {
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		factory.setNamespaceAware(true);
-		DocumentBuilder builder;
-		//Document doc = null;
-		//List<RendezVous> rdvs = new LinkedList<>();
-		//String sdate = Date.formatted(DateTimeFormatter.ISO_LOCAL_DATE);
+	
 		try {
 			// charger le fichier xml
+			Document xmldoc = ConnexionXmlSingleton.getInstance().getDoc();
 			
-			builder = factory.newDocumentBuilder();
-			String filepath = ".\\src\\main\\resources\\ckonsoru.xml";
-			Document xmldoc = builder.parse(filepath);
 			// cree un rdv avec client & veterinaire
 			
 			
@@ -98,9 +90,9 @@ public class AjouterRDV {
 				
 					e.printStackTrace();
 				}
-				StreamResult result = new StreamResult(filepath);
+				StreamResult result = new StreamResult(".\\src\\main\\resources\\ckonsoru.xml");
 				transformer.transform(source, result);
-		} catch (IOException | ParserConfigurationException e) {
+		} catch (IOException e) {
 		String filepath = null;
 		System.err.println("Erreur à l'ouverture de la bdd xml : " + filepath);
 		e.printStackTrace(System.err);

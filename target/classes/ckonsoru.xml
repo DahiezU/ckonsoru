@@ -104,5 +104,20 @@
 <client>M. Parslow</client>
 <veterinaire>L. Asriel</veterinaire>
 </rdv>
+<rdv>
+<debut>2021-03-18T08:00:00</debut>
+<client>M. Parslow</client>
+<veterinaire>L. Belacqua</veterinaire>
+</rdv>
+<rdv>
+<debut>2021-03-18T15:00:00</debut>
+<client>U. Dahiez</client>
+<veterinaire>L. Asriel</veterinaire>
+</rdv>
+<rdv>
+<debut>2021-03-18T15:20:00</debut>
+<client>S. Burdy</client>
+<veterinaire>L. Asriel</veterinaire>
+</rdv>
 </rdvs>
 </ckonsoru>

@@ -13,10 +13,21 @@ public  class DateConv {
     } 
    
 
-    public void afficherGoodFormat(String maDate){
+    public String afficherGoodFormat(String maDate){
+
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-        LocalDateTime debut = LocalDateTime.parse( maDate, timeFormatter);
-        System.out.println("Disponibilités pour le " + debut.format(timeFormatter));
+        LocalDateTime debut = LocalDateTime.parse(maDate, timeFormatter);
+       
+
+        
+        //System.out.println("Disponibilités pour le " + debut.format(timeFormatter));
+        return debut.format(timeFormatter);
+    }
+
+    public LocalDateTime formatMerdeux(String date){
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        LocalDateTime debut = LocalDateTime.parse(date, timeFormatter);
+        return debut;
     }
  
    

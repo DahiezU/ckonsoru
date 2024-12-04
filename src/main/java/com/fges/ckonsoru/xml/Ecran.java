@@ -5,12 +5,13 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.xml.sax.SAXException;
 
 public class Ecran {
-	public void lecran() throws SAXException, IOException, TransformerException {
+	public void lecran() throws SAXException, IOException, TransformerException, ParserConfigurationException {
 		FonctionalitesDAO fonct = new FonctionalitesDAO();
         
         String choix = "Actions disponibles : \n"
@@ -35,7 +36,7 @@ public class Ecran {
 		
 		                    DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 		                    LocalDateTime debut = LocalDateTime.parse(DateIn+" 11:50", timeFormatter);
-		                    fonct.AfficherList(fonct.getRDVVeto(debut));
+		                    fonct.AfficherListDispo(fonct.getRDVVeto(debut));
 		                    //scannCrenaux.close();
 		
 		                    System.out.println(choix);
@@ -47,7 +48,8 @@ public class Ecran {
 		                    System.out.println(explicationStrRdvCli);
 		                    Scanner scanNom = new Scanner(System.in);
 		                    String nomCli =  scanNom.nextLine();
-		                    fonct.AfficherList(fonct.getAllRDV(nomCli));
+		                    
+		                    fonct.AfficherListRDV(fonct.getAllRDV(nomCli));
 		
 		                    System.out.println(choix);
 		                    System.out.println("Entrer un numéro d action:");
